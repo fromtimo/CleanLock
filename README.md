@@ -11,6 +11,7 @@ It dims the screen, blocks accidental input, and lets you exit cleaning mode by 
 ## Language
 
 🇺🇸 [English](#-english)
+
 🇷🇺 [Русский](#-русский)
 
 ---
