@@ -36,10 +36,10 @@ It dims the screen, blocks accidental input, and lets you exit cleaning mode by 
 ## Demo
 
 <p align="center">
-  <video src="assets/demo.mp4" width="720" controls muted loop playsinline>
-    Your browser does not support the video tag.
-  </video>
+  <img src="assets/demo.apng" width="720" alt="CleanLock demo">
 </p>
+
+[Watch the MP4 demo](assets/demo.mp4)
 
 ## Why
 
@@ -201,10 +201,10 @@ CleanLock is released under the MIT License. See [LICENSE](LICENSE).
 ## Demo
 
 <p align="center">
-  <video src="assets/demo.mp4" width="720" controls muted loop playsinline>
-    Ваш браузер не поддерживает видео.
-  </video>
+  <img src="assets/demo.apng" width="720" alt="Демо CleanLock">
 </p>
+
+[Посмотреть MP4-демо](assets/demo.mp4)
 
 ## Зачем это нужно
 
