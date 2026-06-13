@@ -1,14 +1,14 @@
 # CleanLock
 
-**Clean your MacBook without accidental key presses.**
+**Чисти MacBook без случайных нажатий.**
 
-CleanLock is a small native macOS menu bar utility that temporarily blocks keyboard input and trackpad clicks while you clean your MacBook.
+CleanLock - маленькая нативная macOS-утилита для меню-бара, которая временно блокирует клавиатуру, клики и тапы по трекпаду, пока ты чистишь MacBook.
 
-It dims the screen, blocks accidental input, and lets you exit cleaning mode by holding the left and right Command keys for 3 seconds.
+Приложение затемняет экран, блокирует случайный ввод и выходит из режима очистки по удержанию левой и правой Command в течение 3 секунд.
 
 ---
 
-## Language
+## Язык
 
 🇷🇺 [Русский](#-русский)
 
@@ -200,6 +200,12 @@ CleanLock распространяется под лицензией MIT. См. 
 ---
 
 # 🇺🇸 English
+
+## What Is CleanLock
+
+CleanLock is a small native macOS menu bar utility that temporarily blocks keyboard input and trackpad clicks while you clean your MacBook.
+
+It dims the screen, blocks accidental input, and lets you exit cleaning mode by holding the left and right Command keys for 3 seconds.
 
 ## Features
 
