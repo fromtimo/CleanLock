@@ -35,13 +35,11 @@ It dims the screen, blocks accidental input, and lets you exit cleaning mode by 
 
 ## Demo
 
-> Demo video/GIF will be added soon.
-
-<!--
 <p align="center">
-  <img src="assets/demo.gif" width="720" alt="CleanLock demo">
+  <video src="assets/demo.mp4" width="720" controls muted loop playsinline>
+    Your browser does not support the video tag.
+  </video>
 </p>
--->
 
 ## Why
 
@@ -200,15 +198,13 @@ CleanLock is released under the MIT License. See [LICENSE](LICENSE).
 * Работает локально на Mac.
 * Без интернета, аналитики, трекинга и записи нажатий.
 
-## Демо
+## Demo
 
-> Видео/GIF-демо будет добавлено позже.
-
-<!--
 <p align="center">
-  <img src="assets/demo.gif" width="720" alt="CleanLock demo">
+  <video src="assets/demo.mp4" width="720" controls muted loop playsinline>
+    Your browser does not support the video tag.
+  </video>
 </p>
--->
 
 ## Зачем это нужно
 
