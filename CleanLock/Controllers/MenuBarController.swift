@@ -20,6 +20,12 @@ final class MenuBarController: NSObject {
         cleaningModeManager.onPermissionsRequired = { [weak self] in
             self?.showOnboarding(initialStep: .permissions)
         }
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleLanguageChanged),
+            name: .appLanguageDidChange,
+            object: nil
+        )
 
         installStatusItemIfNeeded()
     }
@@ -80,12 +86,12 @@ final class MenuBarController: NSObject {
         let menu = NSMenu()
 
         if cleaningModeManager.isCleaningModeActive {
-            let activeItem = NSMenuItem(title: "Режим очистки включён", action: nil, keyEquivalent: "")
+            let activeItem = NSMenuItem(title: text(.cleaningModeEnabled), action: nil, keyEquivalent: "")
             activeItem.isEnabled = false
             menu.addItem(activeItem)
         } else {
             menu.addItem(NSMenuItem(
-                title: "Включить режим очистки",
+                title: text(.startCleaningMode),
                 action: #selector(startCleaningMode),
                 keyEquivalent: ""
             ))
@@ -93,7 +99,7 @@ final class MenuBarController: NSObject {
 
         menu.addItem(.separator())
         let settingsItem = NSMenuItem(
-            title: "Настройки",
+            title: text(.settings),
             action: #selector(showSettings),
             keyEquivalent: ""
         )
@@ -101,7 +107,7 @@ final class MenuBarController: NSObject {
         menu.addItem(settingsItem)
 
         menu.addItem(NSMenuItem(
-            title: "Выйти",
+            title: text(.quit),
             action: #selector(quitApplication),
             keyEquivalent: ""
         ))
@@ -130,8 +136,8 @@ final class MenuBarController: NSObject {
         }
 
         let window = makeWindow(
-            title: "Настройки CleanLock",
-            size: NSSize(width: 520, height: 380),
+            title: text(.settingsWindowTitle),
+            size: NSSize(width: 520, height: 430),
             rootView: SettingsView()
         )
         window.delegate = self
@@ -145,6 +151,15 @@ final class MenuBarController: NSObject {
     @objc private func quitApplication() {
         cleaningModeManager.stopCleaningMode()
         NSApp.terminate(nil)
+    }
+
+    @objc private func handleLanguageChanged() {
+        settingsWindow?.title = text(.settingsWindowTitle)
+        rebuildMenu()
+    }
+
+    private func text(_ key: AppStrings.Key) -> String {
+        AppStrings.text(key, language: PreferencesStore.shared.appLanguage)
     }
 
     private func makeWindow<Content: View>(

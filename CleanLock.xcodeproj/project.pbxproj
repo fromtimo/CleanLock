@@ -23,6 +23,8 @@
 		00000000000000000000005F /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000003F /* OnboardingView.swift */; };
 		000000000000000000000060 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000040 /* SettingsView.swift */; };
 		000000000000000000000061 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000042 /* AppIcon.icns */; };
+		000000000000000000000062 /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000043 /* Localization.swift */; };
+		000000000000000000000063 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000046 /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +46,9 @@
 		000000000000000000000040 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		000000000000000000000041 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		000000000000000000000042 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
+		000000000000000000000043 /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
+		000000000000000000000044 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		000000000000000000000045 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +127,7 @@
 				00000000000000000000003B /* OnboardingStep.swift */,
 				00000000000000000000003C /* AutoUnlockDuration.swift */,
 				00000000000000000000003D /* DisplayScope.swift */,
+				000000000000000000000043 /* Localization.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -140,6 +146,7 @@
 			isa = PBXGroup;
 			children = (
 				000000000000000000000041 /* Info.plist */,
+				000000000000000000000046 /* InfoPlist.strings */,
 				000000000000000000000042 /* AppIcon.icns */,
 			);
 			path = Resources;
@@ -186,6 +193,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				ru,
 				Base,
 			);
 			mainGroup = 000000000000000000000003;
@@ -204,10 +212,23 @@
 			buildActionMask = 2147483647;
 			files = (
 				000000000000000000000061 /* AppIcon.icns in Resources */,
+				000000000000000000000063 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		000000000000000000000046 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				000000000000000000000044 /* en */,
+				000000000000000000000045 /* ru */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin PBXSourcesBuildPhase section */
 		000000000000000000000005 /* Sources */ = {
@@ -226,6 +247,7 @@
 				00000000000000000000005B /* OnboardingStep.swift in Sources */,
 				00000000000000000000005C /* AutoUnlockDuration.swift in Sources */,
 				00000000000000000000005D /* DisplayScope.swift in Sources */,
+				000000000000000000000062 /* Localization.swift in Sources */,
 				00000000000000000000005E /* CleaningOverlayView.swift in Sources */,
 				00000000000000000000005F /* OnboardingView.swift in Sources */,
 				000000000000000000000060 /* SettingsView.swift in Sources */,

@@ -85,7 +85,7 @@ final class CleaningModeManager: ObservableObject {
             overlayManager.hideOverlay()
             state = .inactive
             showMessage(
-                title: "Режим очистки не запущен",
+                title: text(.cleaningModeNotStarted),
                 message: error.localizedDescription
             )
         }
@@ -111,8 +111,8 @@ final class CleaningModeManager: ObservableObject {
 
         stopCleaningMode()
         showMessage(
-            title: "Режим очистки был отключён",
-            message: "Изменился набор экранов. CleanLock вернул управление."
+            title: text(.cleaningModeDisabled),
+            message: text(.displayConfigurationChanged)
         )
     }
 
@@ -134,7 +134,7 @@ final class CleaningModeManager: ObservableObject {
 
         if wasActive {
             showMessage(
-                title: "Режим очистки был отключён",
+                title: text(.cleaningModeDisabled),
                 message: message
             )
         }
@@ -162,5 +162,9 @@ final class CleaningModeManager: ObservableObject {
         alert.alertStyle = .warning
         alert.addButton(withTitle: "OK")
         alert.runModal()
+    }
+
+    private func text(_ key: AppStrings.Key) -> String {
+        AppStrings.text(key, language: preferences.appLanguage)
     }
 }

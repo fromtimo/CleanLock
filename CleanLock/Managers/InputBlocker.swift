@@ -20,7 +20,7 @@ enum InputBlockerError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .eventTapCreationFailed:
-            return "Не удалось включить блокировку ввода. Проверь разрешения Accessibility и Input Monitoring."
+            return AppStrings.text(.inputBlockerFailed)
         }
     }
 }
@@ -313,14 +313,14 @@ final class InputBlocker {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             guard let eventTap = self.eventTap, CFMachPortIsValid(eventTap) else {
-                self.onFailure?("macOS остановила обработку ввода. CleanLock вернул управление.")
+                self.onFailure?(AppStrings.text(.eventTapStopped))
                 return
             }
 
             CGEvent.tapEnable(tap: eventTap, enable: true)
 
             if !CFMachPortIsValid(eventTap) || !CGEvent.tapIsEnabled(tap: eventTap) {
-                self.onFailure?("macOS остановила обработку ввода. CleanLock вернул управление.")
+                self.onFailure?(AppStrings.text(.eventTapStopped))
             }
         }
     }

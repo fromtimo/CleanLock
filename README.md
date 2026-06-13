@@ -28,6 +28,7 @@ It dims the screen, blocks accidental input, and lets you exit cleaning mode by 
 * Includes an automatic safety timeout: 5, 10, or 20 minutes.
 * Can dim all displays or only the main display.
 * Runs as a native macOS menu bar app.
+* Supports English and Russian, with a language selector in Settings.
 * Works locally on your Mac.
 * No network access, no analytics, no tracking, no key logging.
 
@@ -116,6 +117,12 @@ System Settings -> Privacy & Security -> Input Monitoring
 
 If the unlock gesture does not work, CleanLock exits automatically after the configured safety timeout.
 
+## Language
+
+CleanLock supports English and Russian.
+
+On first launch, the app uses Russian if your macOS system language is Russian. For all other system languages, CleanLock starts in English. You can switch the language anytime in Settings.
+
 ## External Keyboards
 
 CleanLock uses the left and right Command keys as the unlock gesture.
@@ -188,6 +195,7 @@ CleanLock is released under the MIT License. See [LICENSE](LICENSE).
 * Имеет страховочный таймер автоотключения: 5, 10 или 20 минут.
 * Может затемнять все экраны или только главный экран.
 * Работает как нативное macOS-приложение в меню-баре.
+* Поддерживает русский и английский язык с выбором в настройках.
 * Работает локально на Mac.
 * Без интернета, аналитики, трекинга и записи нажатий.
 
@@ -275,6 +283,12 @@ CleanLock запрашивает:
 8. Удерживай левую и правую Command 3 секунды, чтобы выйти из режима очистки.
 
 Если сочетание для выхода не сработает, CleanLock автоматически выйдет из режима по страховочному таймеру.
+
+## Язык
+
+CleanLock поддерживает русский и английский язык.
+
+При первом запуске приложение выбирает русский, если язык системы macOS - русский. Для всех остальных системных языков CleanLock запускается на английском. Язык можно изменить в настройках в любой момент.
 
 ## Внешние клавиатуры
 

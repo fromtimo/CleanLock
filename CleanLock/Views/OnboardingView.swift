@@ -4,6 +4,7 @@ import SwiftUI
 @MainActor
 struct OnboardingView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @ObservedObject private var preferences = PreferencesStore.shared
     @ObservedObject private var permissions = PermissionManager.shared
     @StateObject private var unlockTest = CommandUnlockTestModel()
     @State private var step: OnboardingStep
@@ -110,11 +111,11 @@ struct OnboardingView: View {
                 Text("CleanLock")
                     .font(.system(size: 30, weight: .semibold))
 
-                Text("Безопасно чисти клавиатуру и трекпад MacBook без случайных нажатий.")
+                Text(text(.welcomeSubtitle))
                     .font(.title3)
                     .multilineTextAlignment(.center)
 
-                Text("Утилита временно блокирует клавиатуру и клики по трекпаду, затемняет экран и показывает понятный способ выхода из режима очистки.\n\nCleanLock не записывает нажатия клавиш, не использует интернет и не собирает аналитику.")
+                Text(text(.welcomeBody))
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.secondary)
             }
@@ -126,7 +127,7 @@ struct OnboardingView: View {
             HStack {
                 Spacer()
 
-                Button("Продолжить") {
+                Button(text(.continueButton)) {
                     advance(to: .permissions)
                 }
                 .controlSize(.large)
@@ -137,15 +138,15 @@ struct OnboardingView: View {
 
     private var permissionsStep: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Text("Нужны разрешения macOS")
+            Text(text(.permissionsTitle))
                 .font(.system(size: 24, weight: .semibold))
 
-            Text("Чтобы блокировать случайные нажатия и определять сочетание для выхода из режима очистки, CleanLock нужны системные разрешения.")
+            Text(text(.permissionsDescription))
                 .foregroundStyle(.secondary)
 
             PermissionRow(
-                title: "Универсальный доступ",
-                description: "Позволяет CleanLock блокировать события клавиатуры и трекпада во время режима очистки.",
+                title: text(.accessibilityTitle),
+                description: text(.accessibilityDescription),
                 status: permissions.accessibilityStatus,
                 action: {
                     permissions.openAccessibilitySettings()
@@ -153,29 +154,29 @@ struct OnboardingView: View {
             )
 
             PermissionRow(
-                title: "Мониторинг ввода",
-                description: "Позволяет CleanLock определять удержание двух клавиш Command для выхода из режима очистки.",
+                title: text(.inputMonitoringTitle),
+                description: text(.inputMonitoringDescription),
                 status: permissions.inputMonitoringStatus,
                 action: {
                     permissions.openInputMonitoringSettings()
                 }
             )
 
-            Text("Нажатия не сохраняются и никуда не отправляются. Разрешения нужны только для работы режима блокировки.")
+            Text(text(.permissionsPrivacyNote))
                 .font(.footnote)
                 .foregroundStyle(.secondary)
 
             Spacer()
 
             HStack {
-                Button("Назад") {
+                Button(text(.backButton)) {
                     retreat(to: .welcome)
                 }
                 .controlSize(.large)
 
                 Spacer()
 
-                Button("Продолжить") {
+                Button(text(.continueButton)) {
                     advance(to: .unlockTest)
                 }
                 .disabled(!permissions.canContinuePastPermissionStep)
@@ -190,29 +191,29 @@ struct OnboardingView: View {
             Spacer()
 
             VStack(spacing: 18) {
-                Text("Проверь разблокировку")
+                Text(text(.unlockTestTitle))
                     .font(.system(size: 26, weight: .semibold))
 
-                Text("Удерживай левую и правую клавиши Command в течение 3 секунд.")
+                Text(text(.unlockTestDescription))
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
 
                 HStack(spacing: 32) {
                     OnboardingCommandKeyView(
-                        title: "Левый ⌘",
+                        title: text(.leftCommand),
                         isActive: unlockTest.commandKeyState.isLeftCommandPressed,
                         progress: unlockTest.progressForVisibleRings
                     )
 
                     OnboardingCommandKeyView(
-                        title: "Правый ⌘",
+                        title: text(.rightCommand),
                         isActive: unlockTest.commandKeyState.isRightCommandPressed,
                         progress: unlockTest.progressForVisibleRings
                     )
                 }
                 .padding(.top, 12)
 
-                Text("Для выхода нужны левая и правая Command. Если на внешней клавиатуре нет правой Command или сочетание не сработает, режим автоматически отключится по страховочному таймеру.")
+                Text(text(.unlockTestFootnote))
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -224,7 +225,7 @@ struct OnboardingView: View {
             Spacer()
 
             HStack {
-                Button("Назад") {
+                Button(text(.backButton)) {
                     retreat(to: .permissions)
                 }
                 .controlSize(.large)
@@ -244,10 +245,10 @@ struct OnboardingView: View {
                     .foregroundStyle(.green)
                     .accessibilityHidden(true)
 
-                Text("Настройка завершена")
+                Text(text(.completedTitle))
                     .font(.system(size: 28, weight: .semibold))
 
-                Text("CleanLock готов к использованию. Включить режим очистки можно через иконку в меню-баре.")
+                Text(text(.completedDescription))
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
@@ -256,7 +257,7 @@ struct OnboardingView: View {
 
             Spacer()
 
-            Button("Готово") {
+            Button(text(.doneButton)) {
                 PreferencesStore.shared.hasCompletedOnboarding = true
                 onComplete()
             }
@@ -288,6 +289,10 @@ struct OnboardingView: View {
                 return
             }
         }
+    }
+
+    private func text(_ key: AppStrings.Key) -> String {
+        AppStrings.text(key, language: preferences.appLanguage)
     }
 }
 
@@ -371,12 +376,12 @@ private struct PermissionRow: View {
 
                     Spacer()
 
-                    Text(status.title)
+                    Text(status.title(language: PreferencesStore.shared.appLanguage))
                         .font(.caption)
                         .foregroundStyle(.secondary)
 
                     if status != .granted {
-                        Button("Открыть") {
+                        Button(AppStrings.text(.openButton, language: PreferencesStore.shared.appLanguage)) {
                             action()
                         }
                         .controlSize(.small)

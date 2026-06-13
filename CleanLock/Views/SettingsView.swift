@@ -10,23 +10,20 @@ struct SettingsView: View {
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 18) {
-                Text("Настройки")
+                Text(text(.settingsTitle))
                     .font(.system(size: 24, weight: .semibold))
 
                 VStack(spacing: 10) {
-                    SettingsIslandRow(title: "Запускать при входе") {
+                    SettingsIslandRow(title: text(.launchAtLogin)) {
                         Toggle("", isOn: launchAtLoginBinding)
                             .toggleStyle(.switch)
                             .labelsHidden()
                     }
 
-                    SettingsIslandRow(
-                        title: "Автоотключение",
-                        subtitle: "Страховочный таймер для выхода из режима очистки."
-                    ) {
-                        Picker("Автоотключение", selection: $preferences.autoUnlockDuration) {
-                            ForEach(AutoUnlockDuration.allCases) { duration in
-                                Text(duration.title).tag(duration)
+                    SettingsIslandRow(title: text(.language)) {
+                        Picker(text(.language), selection: $preferences.appLanguage) {
+                            ForEach(AppLanguage.allCases) { language in
+                                Text(language.title).tag(language)
                             }
                         }
                         .pickerStyle(.menu)
@@ -35,12 +32,26 @@ struct SettingsView: View {
                     }
 
                     SettingsIslandRow(
-                        title: "Экраны",
-                        subtitle: "Какие экраны затемнять во время режима очистки."
+                        title: text(.autoUnlock),
+                        subtitle: text(.autoUnlockSubtitle)
                     ) {
-                        Picker("Экраны", selection: $preferences.displayScope) {
+                        Picker(text(.autoUnlock), selection: $preferences.autoUnlockDuration) {
+                            ForEach(AutoUnlockDuration.allCases) { duration in
+                                Text(duration.title(language: preferences.appLanguage)).tag(duration)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .labelsHidden()
+                        .frame(width: 128, alignment: .trailing)
+                    }
+
+                    SettingsIslandRow(
+                        title: text(.displays),
+                        subtitle: text(.displaysSubtitle)
+                    ) {
+                        Picker(text(.displays), selection: $preferences.displayScope) {
                             ForEach(DisplayScope.allCases) { scope in
-                                Text(scope.title).tag(scope)
+                                Text(scope.title(language: preferences.appLanguage)).tag(scope)
                             }
                         }
                         .pickerStyle(.menu)
@@ -53,11 +64,15 @@ struct SettingsView: View {
             }
             .padding(24)
         }
-        .frame(width: 520, height: 380)
+        .frame(width: 520, height: 430)
         .background(WindowTitleHider())
         .onAppear {
             preferences.refreshLaunchAtLoginStatus()
         }
+    }
+
+    private func text(_ key: AppStrings.Key) -> String {
+        AppStrings.text(key, language: preferences.appLanguage)
     }
 
     private var launchAtLoginBinding: Binding<Bool> {

@@ -8,13 +8,17 @@ enum AutoUnlockDuration: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 
     var title: String {
+        title(language: .current)
+    }
+
+    func title(language: AppLanguage) -> String {
         switch self {
         case .fiveMinutes:
-            return "5 минут"
+            return AppStrings.text(.autoUnlockFiveMinutes, language: language)
         case .tenMinutes:
-            return "10 минут"
+            return AppStrings.text(.autoUnlockTenMinutes, language: language)
         case .twentyMinutes:
-            return "20 минут"
+            return AppStrings.text(.autoUnlockTwentyMinutes, language: language)
         }
     }
 

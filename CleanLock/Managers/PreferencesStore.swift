@@ -9,6 +9,7 @@ final class PreferencesStore: ObservableObject {
         static let hasCompletedOnboarding = "hasCompletedOnboarding"
         static let autoUnlockDuration = "cleaningModeAutoUnlockDuration"
         static let displayScope = "cleaningModeDisplayScope"
+        static let appLanguage = "appLanguage"
     }
 
     @Published var hasCompletedOnboarding: Bool {
@@ -29,6 +30,13 @@ final class PreferencesStore: ObservableObject {
         }
     }
 
+    @Published var appLanguage: AppLanguage {
+        didSet {
+            defaults.set(appLanguage.rawValue, forKey: Keys.appLanguage)
+            NotificationCenter.default.post(name: .appLanguageDidChange, object: self)
+        }
+    }
+
     @Published private(set) var launchAtLoginEnabled: Bool
 
     private let defaults: UserDefaults
@@ -44,6 +52,10 @@ final class PreferencesStore: ObservableObject {
         let displayScopeRawValue = defaults.string(forKey: Keys.displayScope)
         self.displayScope = displayScopeRawValue
             .flatMap(DisplayScope.init(rawValue:)) ?? .allDisplays
+
+        let languageRawValue = defaults.string(forKey: Keys.appLanguage)
+        self.appLanguage = languageRawValue
+            .flatMap(AppLanguage.init(rawValue:)) ?? .defaultForSystem
 
         self.launchAtLoginEnabled = Self.isLaunchAtLoginEnabled
     }

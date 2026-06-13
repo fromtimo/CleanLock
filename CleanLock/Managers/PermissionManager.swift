@@ -10,15 +10,19 @@ enum PermissionState: Equatable {
     case requiresManualCheck
 
     var title: String {
+        title(language: .current)
+    }
+
+    func title(language: AppLanguage) -> String {
         switch self {
         case .notGranted:
-            return "Не выдано"
+            return AppStrings.text(.notGranted, language: language)
         case .granted:
-            return "Выдано"
+            return AppStrings.text(.granted, language: language)
         case .requiresRestart:
-            return "Требуется перезапуск"
+            return AppStrings.text(.requiresRestart, language: language)
         case .requiresManualCheck:
-            return "Требуется проверка"
+            return AppStrings.text(.requiresManualCheck, language: language)
         }
     }
 }
@@ -39,15 +43,17 @@ final class PermissionManager: ObservableObject {
     }
 
     var permissionIssueMessage: String {
+        let language = PreferencesStore.shared.appLanguage
+
         if accessibilityStatus != .granted {
-            return "CleanLock нужен доступ «Универсальный доступ», чтобы временно блокировать ввод во время режима очистки."
+            return AppStrings.text(.permissionIssueAccessibility, language: language)
         }
 
         if inputMonitoringStatus == .notGranted {
-            return "CleanLock нужен доступ «Мониторинг ввода», чтобы определить удержание левой и правой Command для выхода."
+            return AppStrings.text(.permissionIssueInputMonitoring, language: language)
         }
 
-        return "Проверь разрешения macOS для CleanLock и попробуй снова."
+        return AppStrings.text(.permissionIssueGeneric, language: language)
     }
 
     var canContinuePastPermissionStep: Bool {

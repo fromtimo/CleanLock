@@ -3,6 +3,7 @@ import SwiftUI
 @MainActor
 struct CleaningOverlayView: View {
     @ObservedObject var state: OverlayState
+    @ObservedObject private var preferences = PreferencesStore.shared
 
     private var commandKeyState: CommandKeyState {
         state.commandKeyState
@@ -23,13 +24,13 @@ struct CleaningOverlayView: View {
                     .font(.system(size: 44, weight: .semibold))
                     .foregroundStyle(Color.white.opacity(0.86))
 
-                Text("Режим очистки")
+                Text(text(.overlayTitle))
                     .font(.system(size: 28, weight: .semibold))
                     .foregroundStyle(Color.white.opacity(0.86))
 
                 VStack(spacing: 4) {
-                    Text("Клавиатура и клики заблокированы.")
-                    Text("Для выхода удерживай левую и правую Command 3 секунды.")
+                    Text(text(.overlayInputBlocked))
+                    Text(text(.overlayExitInstruction))
                 }
                 .font(.system(size: 15))
                 .multilineTextAlignment(.center)
@@ -38,13 +39,13 @@ struct CleaningOverlayView: View {
 
                 HStack(spacing: 32) {
                     CommandKeyView(
-                        title: "Левый ⌘",
+                        title: text(.leftCommand),
                         isActive: commandKeyState.isLeftCommandPressed,
                         progress: bothCommandsPressed ? commandKeyState.progress : 0
                     )
 
                     CommandKeyView(
-                        title: "Правый ⌘",
+                        title: text(.rightCommand),
                         isActive: commandKeyState.isRightCommandPressed,
                         progress: bothCommandsPressed ? commandKeyState.progress : 0
                     )
@@ -56,6 +57,10 @@ struct CleaningOverlayView: View {
             .offset(y: state.contentYOffset)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private func text(_ key: AppStrings.Key) -> String {
+        AppStrings.text(key, language: preferences.appLanguage)
     }
 }
 

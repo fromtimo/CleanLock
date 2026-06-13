@@ -27,7 +27,7 @@
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSInputMonitoringUsageDescription</key>
-	<string>CleanLock использует мониторинг ввода только для определения удержания левой и правой Command во время режима очистки.</string>
+	<string>CleanLock uses input monitoring only to detect holding the left and right Command keys during cleaning mode.</string>
 	<key>NSSupportsAutomaticTermination</key>
 	<false/>
 	<key>NSSupportsSuddenTermination</key>

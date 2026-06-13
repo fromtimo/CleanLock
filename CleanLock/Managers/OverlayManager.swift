@@ -8,7 +8,7 @@ enum OverlayError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .noScreens:
-            return "Не удалось определить экран для режима очистки."
+            return AppStrings.text(.overlayNoScreens)
         }
     }
 }
