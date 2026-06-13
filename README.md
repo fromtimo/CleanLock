@@ -140,6 +140,24 @@ Some external keyboards do not have a right Command key or report modifier keys 
 * macOS 13.0 or later
 * Xcode 15 or later recommended
 
+## Install Release Build
+
+The public build is not signed or notarized by Apple yet. Because of that, macOS may block the app on first launch.
+
+To install it:
+
+1. Open the [Releases](https://github.com/fromtimo/CleanLock/releases) page.
+2. Download `CleanLock.zip`.
+3. Unzip the archive.
+4. Drag `CleanLock.app` into the `Applications` folder.
+5. Run this command in Terminal:
+
+```bash
+sudo xattr -r -c /Applications/CleanLock.app
+```
+
+Then launch CleanLock from `Applications` and complete onboarding.
+
 ## Build From Source
 
 Clone the repository and open the Xcode project:
@@ -304,6 +322,24 @@ CleanLock использует левую и правую Command как соч�
 
 * macOS 13.0 или новее
 * Рекомендуется Xcode 15 или новее
+
+## Установка релизной сборки
+
+Публичная сборка пока не подписана и не notarized Apple. Из-за этого macOS может заблокировать приложение при первом запуске.
+
+Как установить:
+
+1. Открой страницу [Releases](https://github.com/fromtimo/CleanLock/releases).
+2. Скачай `CleanLock.zip`.
+3. Распакуй архив.
+4. Перетащи `CleanLock.app` в папку `Applications`.
+5. Выполни команду в Terminal:
+
+```bash
+sudo xattr -r -c /Applications/CleanLock.app
+```
+
+После этого запусти CleanLock из `Applications` и пройди onboarding.
 
 ## Сборка из исходников
 
