@@ -122,6 +122,8 @@ enum AppStrings {
             return "Keyboard and clicks are blocked."
         case .overlayExitInstruction:
             return "To exit, hold left and right Command for 3 seconds."
+        case .autoUnlockCountdownPrefix:
+            return "Auto-unlocks in"
         case .settingsTitle:
             return "Settings"
         case .launchAtLogin:
@@ -233,6 +235,8 @@ enum AppStrings {
             return "Клавиатура и клики заблокированы."
         case .overlayExitInstruction:
             return "Для выхода удерживай левую и правую Command 3 секунды."
+        case .autoUnlockCountdownPrefix:
+            return "Автоотключение через"
         case .settingsTitle:
             return "Настройки"
         case .launchAtLogin:
@@ -305,6 +309,7 @@ extension AppStrings {
         case overlayTitle
         case overlayInputBlocked
         case overlayExitInstruction
+        case autoUnlockCountdownPrefix
         case settingsTitle
         case launchAtLogin
         case language

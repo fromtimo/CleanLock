@@ -6,7 +6,6 @@ final class MenuBarController: NSObject {
     private var statusItem: NSStatusItem?
     private let cleaningModeManager: CleaningModeManager
     private var onboardingWindow: NSWindow?
-    private var settingsWindow: NSWindow?
 
     init(cleaningModeManager: CleaningModeManager) {
         self.cleaningModeManager = cleaningModeManager
@@ -103,7 +102,6 @@ final class MenuBarController: NSObject {
             action: #selector(showSettings),
             keyEquivalent: ""
         )
-        settingsItem.isEnabled = PreferencesStore.shared.hasCompletedOnboarding
         menu.addItem(settingsItem)
 
         menu.addItem(NSMenuItem(
@@ -129,23 +127,7 @@ final class MenuBarController: NSObject {
     }
 
     @objc private func showSettings() {
-        if let settingsWindow {
-            settingsWindow.makeKeyAndOrderFront(nil)
-            NSApp.activate(ignoringOtherApps: true)
-            return
-        }
-
-        let window = makeWindow(
-            title: text(.settingsWindowTitle),
-            size: NSSize(width: 520, height: 430),
-            rootView: SettingsView()
-        )
-        window.delegate = self
-
-        settingsWindow = window
-        centerWindowOnMainScreen(window)
-        window.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
+        SettingsWindowController.shared.show()
     }
 
     @objc private func quitApplication() {
@@ -154,7 +136,6 @@ final class MenuBarController: NSObject {
     }
 
     @objc private func handleLanguageChanged() {
-        settingsWindow?.title = text(.settingsWindowTitle)
         rebuildMenu()
     }
 
@@ -207,10 +188,6 @@ extension MenuBarController: NSWindowDelegate {
             if PreferencesStore.shared.hasCompletedOnboarding {
                 NSApp.setActivationPolicy(.accessory)
             }
-        }
-
-        if window === settingsWindow {
-            settingsWindow = nil
         }
     }
 }

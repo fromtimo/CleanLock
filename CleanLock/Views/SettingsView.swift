@@ -61,11 +61,17 @@ struct SettingsView: View {
                 }
 
                 Spacer(minLength: 0)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(appVersionText)
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                }
             }
             .padding(24)
         }
         .frame(width: 520, height: 430)
-        .background(WindowTitleHider())
+        .background(WindowTitleHider(extendsContentIntoTitlebar: true))
         .onAppear {
             preferences.refreshLaunchAtLoginStatus()
         }
@@ -80,6 +86,11 @@ struct SettingsView: View {
             get: { preferences.launchAtLoginEnabled },
             set: { preferences.setLaunchAtLoginEnabled($0) }
         )
+    }
+
+    private var appVersionText: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.1"
+        return "v\(version)"
     }
 }
 

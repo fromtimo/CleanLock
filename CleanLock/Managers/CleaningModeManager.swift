@@ -22,6 +22,7 @@ final class CleaningModeManager: ObservableObject {
     private let overlayManager: OverlayManager
     private let preferences: PreferencesStore
     private var autoUnlockTimer: Timer?
+    private var unlockCompletionTask: Task<Void, Never>?
 
     private convenience init() {
         self.init(
@@ -48,7 +49,7 @@ final class CleaningModeManager: ObservableObject {
 
         self.inputBlocker.onUnlockCompleted = { [weak self] in
             Task { @MainActor in
-                self?.stopCleaningMode()
+                self?.completeUnlockAndStopCleaningMode()
             }
         }
 
@@ -62,6 +63,8 @@ final class CleaningModeManager: ObservableObject {
     func startCleaningMode() {
         guard !state.isActive else { return }
 
+        unlockCompletionTask?.cancel()
+        unlockCompletionTask = nil
         state = .starting
 
         let permissionManager = PermissionManager.shared
@@ -74,7 +77,10 @@ final class CleaningModeManager: ObservableObject {
         }
 
         do {
-            try overlayManager.showOverlay(displayScope: preferences.displayScope)
+            try overlayManager.showOverlay(
+                displayScope: preferences.displayScope,
+                autoUnlockDuration: preferences.autoUnlockDuration
+            )
             try inputBlocker.start()
             scheduleAutoUnlockIfNeeded()
             state = .active
@@ -94,6 +100,8 @@ final class CleaningModeManager: ObservableObject {
     func stopCleaningMode() {
         guard state.isActive else { return }
 
+        unlockCompletionTask?.cancel()
+        unlockCompletionTask = nil
         state = .stopping
         autoUnlockTimer?.invalidate()
         autoUnlockTimer = nil
@@ -117,14 +125,37 @@ final class CleaningModeManager: ObservableObject {
     }
 
     private func handleCommandStateChanged(_ commandState: CommandKeyState) {
-        overlayManager.updateCommandKeyState(commandState)
-
         guard state.isActive else { return }
+
+        overlayManager.updateCommandKeyState(commandState)
 
         if commandState.progress > 0 {
             state = .unlocking(progress: commandState.progress)
         } else {
             state = .active
+        }
+    }
+
+    private func completeUnlockAndStopCleaningMode() {
+        guard state.isActive else { return }
+
+        state = .stopping
+        autoUnlockTimer?.invalidate()
+        autoUnlockTimer = nil
+        inputBlocker.stop()
+        overlayManager.markUnlockCompleted()
+
+        unlockCompletionTask?.cancel()
+        unlockCompletionTask = Task { @MainActor in
+            let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+            let delay: UInt64 = reduceMotion ? 150_000_000 : 450_000_000
+            try? await Task.sleep(nanoseconds: delay)
+
+            guard !Task.isCancelled else { return }
+
+            overlayManager.hideOverlay()
+            state = .inactive
+            unlockCompletionTask = nil
         }
     }
 

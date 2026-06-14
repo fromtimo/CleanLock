@@ -8,5 +8,13 @@ struct CleanLockApp: App {
         Settings {
             SettingsView()
         }
+        .commands {
+            CommandGroup(replacing: .appSettings) {
+                Button(AppStrings.text(.settings, language: PreferencesStore.shared.appLanguage)) {
+                    SettingsWindowController.shared.show()
+                }
+                .keyboardShortcut(",", modifiers: .command)
+            }
+        }
     }
 }

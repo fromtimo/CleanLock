@@ -10,6 +10,8 @@ final class PreferencesStore: ObservableObject {
         static let autoUnlockDuration = "cleaningModeAutoUnlockDuration"
         static let displayScope = "cleaningModeDisplayScope"
         static let appLanguage = "appLanguage"
+        static let hasAppliedDefaultLaunchAtLoginPreference = "hasAppliedDefaultLaunchAtLoginPreference"
+        static let hasUserChangedLaunchAtLogin = "hasUserChangedLaunchAtLogin"
     }
 
     @Published var hasCompletedOnboarding: Bool {
@@ -57,6 +59,7 @@ final class PreferencesStore: ObservableObject {
         self.appLanguage = languageRawValue
             .flatMap(AppLanguage.init(rawValue:)) ?? .defaultForSystem
 
+        Self.disableLaunchAtLoginByDefaultIfNeeded(defaults: defaults)
         self.launchAtLoginEnabled = Self.isLaunchAtLoginEnabled
     }
 
@@ -65,6 +68,7 @@ final class PreferencesStore: ObservableObject {
     }
 
     func setLaunchAtLoginEnabled(_ isEnabled: Bool) {
+        defaults.set(true, forKey: Keys.hasUserChangedLaunchAtLogin)
         guard isEnabled != launchAtLoginEnabled else { return }
 
         do {
@@ -82,5 +86,21 @@ final class PreferencesStore: ObservableObject {
 
     private static var isLaunchAtLoginEnabled: Bool {
         SMAppService.mainApp.status == .enabled
+    }
+
+    private static func disableLaunchAtLoginByDefaultIfNeeded(defaults: UserDefaults) {
+        guard !defaults.bool(forKey: Keys.hasAppliedDefaultLaunchAtLoginPreference) else { return }
+        defer {
+            defaults.set(true, forKey: Keys.hasAppliedDefaultLaunchAtLoginPreference)
+        }
+
+        guard !defaults.bool(forKey: Keys.hasUserChangedLaunchAtLogin),
+              isLaunchAtLoginEnabled else { return }
+
+        do {
+            try SMAppService.mainApp.unregister()
+        } catch {
+            NSLog("Failed to disable default launch at login: \(error.localizedDescription)")
+        }
     }
 }

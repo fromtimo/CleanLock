@@ -19,6 +19,8 @@ final class OverlayState: ObservableObject {
     @Published var backgroundOpacity: Double = 0
     @Published var showsContent = false
     @Published var contentYOffset: CGFloat = 18
+    @Published var isUnlockCompleted = false
+    @Published var autoUnlockRemainingSeconds: Int?
 }
 
 @MainActor
@@ -33,8 +35,9 @@ final class OverlayManager {
     private var records: [OverlayWindowRecord] = []
     private var cleanupTask: Task<Void, Never>?
     private var entranceTask: Task<Void, Never>?
+    private var countdownTask: Task<Void, Never>?
 
-    func showOverlay(displayScope: DisplayScope) throws {
+    func showOverlay(displayScope: DisplayScope, autoUnlockDuration: AutoUnlockDuration) throws {
         hideOverlay(immediately: true)
 
         let screens = selectedScreens(for: displayScope)
@@ -47,10 +50,12 @@ final class OverlayManager {
         let backgroundDuration = reduceMotion ? 0.15 : 1.5
         let contentDelay: TimeInterval = reduceMotion ? 0 : 1.15
         let contentDuration: TimeInterval = reduceMotion ? 0.15 : 1
+        let autoUnlockSeconds = Int(autoUnlockDuration.timeInterval)
 
         records = screens.map { screen in
             let state = OverlayState()
             state.contentYOffset = reduceMotion ? 0 : 18
+            state.autoUnlockRemainingSeconds = autoUnlockSeconds
             let showsMainUI = isSameScreen(screen, mainScreen)
             let contentView: AnyView = showsMainUI
                 ? AnyView(CleaningOverlayView(state: state))
@@ -94,6 +99,8 @@ final class OverlayManager {
                 }
             }
         }
+
+        startAutoUnlockCountdown(duration: autoUnlockDuration.timeInterval)
     }
 
     func updateCommandKeyState(_ state: CommandKeyState) {
@@ -104,9 +111,29 @@ final class OverlayManager {
         }
     }
 
+    func markUnlockCompleted() {
+        guard isShowing else { return }
+
+        countdownTask?.cancel()
+        countdownTask = nil
+
+        withAnimation(.spring(response: 0.32, dampingFraction: 0.86, blendDuration: 0.04)) {
+            for record in records where record.showsMainUI {
+                record.state.commandKeyState = CommandKeyState(
+                    isLeftCommandPressed: true,
+                    isRightCommandPressed: true,
+                    progress: 1
+                )
+                record.state.isUnlockCompleted = true
+            }
+        }
+    }
+
     func hideOverlay(immediately: Bool = false) {
         entranceTask?.cancel()
         entranceTask = nil
+        countdownTask?.cancel()
+        countdownTask = nil
         cleanupTask?.cancel()
         cleanupTask = nil
 
@@ -127,6 +154,7 @@ final class OverlayManager {
                 record.state.showsContent = false
                 record.state.contentYOffset = reduceMotion ? 0 : 8
                 record.state.backgroundOpacity = 0
+                record.state.autoUnlockRemainingSeconds = nil
             }
         }
 
@@ -139,6 +167,32 @@ final class OverlayManager {
             for record in activeRecords {
                 record.window.orderOut(nil)
                 record.window.close()
+            }
+        }
+    }
+
+    private func startAutoUnlockCountdown(duration: TimeInterval) {
+        countdownTask?.cancel()
+
+        countdownTask = Task { @MainActor in
+            let startedAt = Date()
+            let totalSeconds = max(Int(duration.rounded(.up)), 0)
+
+            while !Task.isCancelled, isShowing {
+                let elapsed = max(Int(Date().timeIntervalSince(startedAt).rounded(.down)), 0)
+                let remainingSeconds = max(totalSeconds - elapsed, 0)
+
+                for record in records where record.showsMainUI {
+                    record.state.autoUnlockRemainingSeconds = remainingSeconds
+                }
+
+                guard remainingSeconds > 0 else { return }
+
+                do {
+                    try await Task.sleep(nanoseconds: 1_000_000_000)
+                } catch {
+                    return
+                }
             }
         }
     }

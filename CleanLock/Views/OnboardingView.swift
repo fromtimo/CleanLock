@@ -45,10 +45,6 @@ struct OnboardingView: View {
         .onChange(of: step) { newStep in
             handleStepChange(newStep)
         }
-        .onChange(of: unlockTest.isCompleted) { isCompleted in
-            guard isCompleted else { return }
-            advance(to: .completed)
-        }
     }
 
     private var stepTransition: AnyTransition {
@@ -198,20 +194,25 @@ struct OnboardingView: View {
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
 
+                UnlockProgressIndicator(
+                    progress: unlockTest.visibleProgress,
+                    isCompleted: unlockTest.isCompleted,
+                    tint: .primary
+                )
+                .padding(.top, 8)
+                .padding(.bottom, -2)
+
                 HStack(spacing: 32) {
                     OnboardingCommandKeyView(
                         title: text(.leftCommand),
-                        isActive: unlockTest.commandKeyState.isLeftCommandPressed,
-                        progress: unlockTest.progressForVisibleRings
+                        isActive: unlockTest.commandKeyState.isLeftCommandPressed
                     )
 
                     OnboardingCommandKeyView(
                         title: text(.rightCommand),
-                        isActive: unlockTest.commandKeyState.isRightCommandPressed,
-                        progress: unlockTest.progressForVisibleRings
+                        isActive: unlockTest.commandKeyState.isRightCommandPressed
                     )
                 }
-                .padding(.top, 12)
 
                 Text(text(.unlockTestFootnote))
                     .font(.footnote)
@@ -231,6 +232,13 @@ struct OnboardingView: View {
                 .controlSize(.large)
 
                 Spacer()
+
+                Button(text(.continueButton)) {
+                    advance(to: .completed)
+                }
+                .disabled(!unlockTest.isCompleted)
+                .controlSize(.large)
+                .keyboardShortcut(.defaultAction)
             }
         }
     }
@@ -257,12 +265,21 @@ struct OnboardingView: View {
 
             Spacer()
 
-            Button(text(.doneButton)) {
-                PreferencesStore.shared.hasCompletedOnboarding = true
-                onComplete()
+            HStack {
+                Button(text(.backButton)) {
+                    retreat(to: .unlockTest)
+                }
+                .controlSize(.large)
+
+                Spacer()
+
+                Button(text(.doneButton)) {
+                    PreferencesStore.shared.hasCompletedOnboarding = true
+                    onComplete()
+                }
+                .controlSize(.large)
+                .keyboardShortcut(.defaultAction)
             }
-            .controlSize(.large)
-            .keyboardShortcut(.defaultAction)
         }
     }
 
@@ -335,6 +352,8 @@ struct WindowGlassBackground: NSViewRepresentable {
 }
 
 struct WindowTitleHider: NSViewRepresentable {
+    var extendsContentIntoTitlebar = false
+
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
         hideTitleWhenWindowIsAvailable(from: view)
@@ -351,6 +370,12 @@ struct WindowTitleHider: NSViewRepresentable {
 
             window.titleVisibility = .hidden
             window.titlebarAppearsTransparent = true
+
+            if extendsContentIntoTitlebar {
+                window.styleMask.insert(.fullSizeContentView)
+                window.toolbar = nil
+                window.titlebarSeparatorStyle = .none
+            }
         }
     }
 }
@@ -421,34 +446,20 @@ private struct PermissionRow: View {
 private struct OnboardingCommandKeyView: View {
     let title: String
     let isActive: Bool
-    let progress: Double
 
     var body: some View {
-        VStack(spacing: 8) {
-            ZStack {
-                Circle()
-                    .stroke(Color.secondary.opacity(0.18), lineWidth: 2)
-                Circle()
-                    .trim(from: 0, to: min(max(progress, 0), 1))
-                    .stroke(Color.primary.opacity(0.72), style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                    .rotationEffect(.degrees(-90))
-            }
-            .frame(width: 24, height: 24)
-            .opacity(progress > 0 ? 1 : 0)
-
-            Text(title)
-                .font(.system(size: 15, weight: .medium))
-                .foregroundStyle(isActive ? Color.primary : Color.secondary)
-                .frame(width: 112, height: 44)
-                .background(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(Color.primary.opacity(isActive ? 0.12 : 0.06))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .stroke(Color.primary.opacity(isActive ? 0.34 : 0.18), lineWidth: 1)
-                )
-        }
+        Text(title)
+            .font(.system(size: 15, weight: .medium))
+            .foregroundStyle(isActive ? Color.primary : Color.secondary)
+            .frame(width: 112, height: 44)
+            .background(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(Color.primary.opacity(isActive ? 0.12 : 0.06))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(Color.primary.opacity(isActive ? 0.34 : 0.18), lineWidth: 1)
+            )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(title)
     }
@@ -458,8 +469,12 @@ private final class CommandUnlockTestModel: ObservableObject {
     @Published private(set) var commandKeyState: CommandKeyState = .inactive
     @Published private(set) var isCompleted = false
 
-    var progressForVisibleRings: Double {
-        commandKeyState.isLeftCommandPressed && commandKeyState.isRightCommandPressed
+    var visibleProgress: Double {
+        if isCompleted {
+            return 1
+        }
+
+        return commandKeyState.isLeftCommandPressed && commandKeyState.isRightCommandPressed
             ? commandKeyState.progress
             : 0
     }
@@ -483,7 +498,16 @@ private final class CommandUnlockTestModel: ObservableObject {
 
     func start() {
         stop()
-        reset()
+        guard !isCompleted else {
+            commandKeyState = CommandKeyState(
+                isLeftCommandPressed: false,
+                isRightCommandPressed: false,
+                progress: 1
+            )
+            return
+        }
+
+        resetForNewAttempt()
         eventMonitor = NSEvent.addLocalMonitorForEvents(matching: [.flagsChanged]) { [weak self] event in
             self?.handleFlagsChanged(event)
             return event
@@ -498,11 +522,12 @@ private final class CommandUnlockTestModel: ObservableObject {
         stopProgressTimer(resetProgress: true)
         isLeftCommandPressed = false
         isRightCommandPressed = false
-        commandKeyState = .inactive
+        commandKeyState = isCompleted
+            ? CommandKeyState(isLeftCommandPressed: false, isRightCommandPressed: false, progress: 1)
+            : .inactive
     }
 
-    private func reset() {
-        isCompleted = false
+    private func resetForNewAttempt() {
         isLeftCommandPressed = false
         isRightCommandPressed = false
         commandKeyState = .inactive
@@ -593,4 +618,5 @@ private final class CommandUnlockTestModel: ObservableObject {
             progress: commandKeyState.progress
         )
     }
+
 }
