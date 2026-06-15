@@ -53,9 +53,9 @@ final class OverlayManager {
 
         let mainScreen = NSScreen.main ?? screens[0]
         let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
-        let backgroundDuration = reduceMotion ? 0.15 : 1.5
-        let contentDelay: TimeInterval = reduceMotion ? 0 : 1.15
-        let contentDuration: TimeInterval = reduceMotion ? 0.15 : 1
+        let backgroundDuration = reduceMotion ? 0.15 : 0.8
+        let contentDelay: TimeInterval = reduceMotion ? 0 : 0.40
+        let contentDuration: TimeInterval = reduceMotion ? 0.15 : 0.6
         let autoUnlockSeconds = Int(autoUnlockDuration.timeInterval)
 
         records = screens.map { screen in
