@@ -23,6 +23,7 @@
 		00000000000000000000005C /* AutoUnlockDuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000003C /* AutoUnlockDuration.swift */; };
 		00000000000000000000005D /* DisplayScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000003D /* DisplayScope.swift */; };
 		00000000000000000000005E /* CleaningOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000003E /* CleaningOverlayView.swift */; };
+		000000000000000000000070 /* AnimatedLockIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000071 /* AnimatedLockIcon.swift */; };
 		00000000000000000000005F /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000003F /* OnboardingView.swift */; };
 		000000000000000000000060 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000040 /* SettingsView.swift */; };
 		000000000000000000000061 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000042 /* AppIcon.icns */; };
@@ -48,6 +49,7 @@
 		00000000000000000000003C /* AutoUnlockDuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoUnlockDuration.swift; sourceTree = "<group>"; };
 		00000000000000000000003D /* DisplayScope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayScope.swift; sourceTree = "<group>"; };
 		00000000000000000000003E /* CleaningOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleaningOverlayView.swift; sourceTree = "<group>"; };
+		000000000000000000000071 /* AnimatedLockIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedLockIcon.swift; sourceTree = "<group>"; };
 		00000000000000000000003F /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		000000000000000000000040 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		000000000000000000000041 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -145,6 +147,7 @@
 			isa = PBXGroup;
 			children = (
 				00000000000000000000003E /* CleaningOverlayView.swift */,
+				000000000000000000000071 /* AnimatedLockIcon.swift */,
 				00000000000000000000003F /* OnboardingView.swift */,
 				000000000000000000000040 /* SettingsView.swift */,
 			);
@@ -261,6 +264,7 @@
 				00000000000000000000005D /* DisplayScope.swift in Sources */,
 				000000000000000000000062 /* Localization.swift in Sources */,
 				00000000000000000000005E /* CleaningOverlayView.swift in Sources */,
+				000000000000000000000070 /* AnimatedLockIcon.swift in Sources */,
 				00000000000000000000005F /* OnboardingView.swift in Sources */,
 				000000000000000000000060 /* SettingsView.swift in Sources */,
 			);

@@ -25,6 +25,7 @@ final class OverlayState: ObservableObject {
     @Published var backgroundOpacity: Double = 0
     @Published var showsContent = false
     @Published var contentYOffset: CGFloat = 18
+    @Published var lockIconState: AnimatedLockIconState = .unlocked
     @Published var isUnlockCompleted = false
     @Published var autoUnlockRemainingSeconds: Int?
 }
@@ -39,6 +40,7 @@ final class OverlayManager {
 
     private(set) var isShowing = false
     private var records: [OverlayWindowRecord] = []
+    private var closingRecords: [OverlayWindowRecord] = []
     private var cleanupTask: Task<Void, Never>?
     private var entranceTask: Task<Void, Never>?
     private var countdownTask: Task<Void, Never>?
@@ -109,6 +111,23 @@ final class OverlayManager {
                     mainRecord.state.showsContent = true
                     mainRecord.state.contentYOffset = 0
                 }
+
+                if !reduceMotion {
+                    let lockStartDelay = contentDuration * 0.35
+                    try? await Task.sleep(nanoseconds: UInt64(lockStartDelay * 1_000_000_000))
+                }
+
+                guard !Task.isCancelled, isShowing else { return }
+
+                mainRecord.state.lockIconState = .locking
+
+                if !reduceMotion {
+                    let lockDuration = AnimatedLockIconTiming.lockingDuration
+                    try? await Task.sleep(nanoseconds: UInt64(lockDuration * 1_000_000_000))
+                }
+
+                guard !Task.isCancelled, isShowing else { return }
+                mainRecord.state.lockIconState = .locked
             }
         }
 
@@ -148,6 +167,7 @@ final class OverlayManager {
         countdownTask = nil
         cleanupTask?.cancel()
         cleanupTask = nil
+        closeClosingRecords()
 
         guard !records.isEmpty else {
             isShowing = false
@@ -156,29 +176,60 @@ final class OverlayManager {
 
         let activeRecords = records
         records = []
+        closingRecords = activeRecords
         isShowing = false
 
         let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         let fadeDuration = immediately ? 0 : (reduceMotion ? 0.15 : 0.6)
+        let shouldAnimateUnlock = !immediately
+            && !reduceMotion
+            && activeRecords.contains { $0.showsMainUI && $0.state.showsContent }
+        let unlockDuration = shouldAnimateUnlock ? AnimatedLockIconTiming.unlockingDuration : 0
 
-        withAnimation(.easeOut(duration: fadeDuration)) {
-            for record in activeRecords {
-                record.state.showsContent = false
-                record.state.contentYOffset = reduceMotion ? 0 : 8
-                record.state.backgroundOpacity = 0
-                record.state.autoUnlockRemainingSeconds = nil
+        if immediately || reduceMotion {
+            for record in activeRecords where record.showsMainUI {
+                record.state.lockIconState = .unlocked
+            }
+        } else if shouldAnimateUnlock {
+            for record in activeRecords where record.showsMainUI {
+                record.state.lockIconState = .unlocking
             }
         }
 
         cleanupTask = Task { @MainActor in
-            let delay = UInt64(max(fadeDuration, 0) * 1_000_000_000)
-            if delay > 0 {
-                try? await Task.sleep(nanoseconds: delay)
+            let unlockDelay = UInt64(max(unlockDuration, 0) * 1_000_000_000)
+            if unlockDelay > 0 {
+                try? await Task.sleep(nanoseconds: unlockDelay)
             }
 
+            guard !Task.isCancelled else { return }
+
+            for record in activeRecords where record.showsMainUI {
+                record.state.lockIconState = .unlocked
+            }
+
+            withAnimation(.easeOut(duration: fadeDuration)) {
+                for record in activeRecords {
+                    record.state.showsContent = false
+                    record.state.contentYOffset = reduceMotion ? 0 : 8
+                    record.state.backgroundOpacity = 0
+                    record.state.autoUnlockRemainingSeconds = nil
+                }
+            }
+
+            let fadeDelay = UInt64(max(fadeDuration, 0) * 1_000_000_000)
+            if fadeDelay > 0 {
+                try? await Task.sleep(nanoseconds: fadeDelay)
+            }
+
+            guard !Task.isCancelled else { return }
+
             for record in activeRecords {
-                record.window.orderOut(nil)
-                record.window.close()
+                close(record)
+            }
+
+            closingRecords.removeAll { closingRecord in
+                activeRecords.contains { $0.window === closingRecord.window }
             }
         }
     }
@@ -257,6 +308,21 @@ final class OverlayManager {
         }
 
         return lhs.frame == rhs.frame
+    }
+
+    private func closeClosingRecords() {
+        guard !closingRecords.isEmpty else { return }
+
+        for record in closingRecords {
+            close(record)
+        }
+
+        closingRecords = []
+    }
+
+    private func close(_ record: OverlayWindowRecord) {
+        record.window.orderOut(nil)
+        record.window.close()
     }
 }
 

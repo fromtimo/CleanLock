@@ -26,9 +26,7 @@ struct CleaningOverlayView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 18) {
-                Image(systemName: "lock.fill")
-                    .font(.system(size: 44, weight: .semibold))
-                    .foregroundStyle(Color.white.opacity(0.86))
+                AnimatedLockIcon(state: state.lockIconState)
 
                 Text(text(.overlayTitle))
                     .font(.system(size: 28, weight: .semibold))

@@ -26,6 +26,7 @@ SWIFT_FILES=(
   "$ROOT_DIR/CleanLock/Models/DisplayScope.swift"
   "$ROOT_DIR/CleanLock/Models/Localization.swift"
   "$ROOT_DIR/CleanLock/Models/OnboardingStep.swift"
+  "$ROOT_DIR/CleanLock/Views/AnimatedLockIcon.swift"
   "$ROOT_DIR/CleanLock/Views/CleaningOverlayView.swift"
   "$ROOT_DIR/CleanLock/Views/OnboardingView.swift"
   "$ROOT_DIR/CleanLock/Views/SettingsView.swift"
