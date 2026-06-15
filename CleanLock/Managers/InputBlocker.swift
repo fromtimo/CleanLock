@@ -158,11 +158,10 @@ final class InputBlocker {
              .rightMouseDown, .rightMouseUp,
              .otherMouseDown, .otherMouseUp,
              .leftMouseDragged, .rightMouseDragged,
-             .otherMouseDragged:
+             .otherMouseDragged,
+             .mouseMoved,
+             .scrollWheel:
             return nil
-
-        case .mouseMoved, .scrollWheel:
-            return Unmanaged.passUnretained(event)
 
         default:
             return Unmanaged.passUnretained(event)

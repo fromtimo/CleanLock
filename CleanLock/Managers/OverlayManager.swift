@@ -14,6 +14,12 @@ enum OverlayError: LocalizedError {
 }
 
 @MainActor
+final class CleaningOverlayWindow: NSWindow {
+    override var canBecomeKey: Bool { true }
+    override var canBecomeMain: Bool { true }
+}
+
+@MainActor
 final class OverlayState: ObservableObject {
     @Published var commandKeyState: CommandKeyState = .inactive
     @Published var backgroundOpacity: Double = 0
@@ -76,6 +82,12 @@ final class OverlayManager {
 
         for record in records {
             record.window.orderFrontRegardless()
+        }
+
+        NSApp.activate(ignoringOtherApps: true)
+
+        if let mainWindow = records.first(where: \.showsMainUI)?.window {
+            mainWindow.makeKeyAndOrderFront(nil)
         }
 
         withAnimation(.easeInOut(duration: backgroundDuration)) {
@@ -210,7 +222,7 @@ final class OverlayManager {
         for screen: NSScreen,
         hostingController: NSHostingController<AnyView>
     ) -> NSWindow {
-        let window = NSWindow(
+        let window = CleaningOverlayWindow(
             contentRect: screen.frame,
             styleMask: [.borderless],
             backing: .buffered,

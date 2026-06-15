@@ -21,6 +21,8 @@ final class CleaningModeManager: ObservableObject {
     private let inputBlocker: InputBlocker
     private let overlayManager: OverlayManager
     private let preferences: PreferencesStore
+    private let pointerDeviceSeizer: PointerDeviceSeizer
+    private let cursorController: CursorController
     private var autoUnlockTimer: Timer?
     private var unlockCompletionTask: Task<Void, Never>?
 
@@ -28,18 +30,24 @@ final class CleaningModeManager: ObservableObject {
         self.init(
             inputBlocker: InputBlocker(),
             overlayManager: OverlayManager(),
-            preferences: PreferencesStore.shared
+            preferences: PreferencesStore.shared,
+            pointerDeviceSeizer: PointerDeviceSeizer(),
+            cursorController: CursorController()
         )
     }
 
     init(
         inputBlocker: InputBlocker,
         overlayManager: OverlayManager,
-        preferences: PreferencesStore
+        preferences: PreferencesStore,
+        pointerDeviceSeizer: PointerDeviceSeizer,
+        cursorController: CursorController
     ) {
         self.inputBlocker = inputBlocker
         self.overlayManager = overlayManager
         self.preferences = preferences
+        self.pointerDeviceSeizer = pointerDeviceSeizer
+        self.cursorController = cursorController
 
         self.inputBlocker.onCommandStateChanged = { [weak self] commandState in
             Task { @MainActor in
@@ -81,6 +89,8 @@ final class CleaningModeManager: ObservableObject {
                 displayScope: preferences.displayScope,
                 autoUnlockDuration: preferences.autoUnlockDuration
             )
+            pointerDeviceSeizer.start()
+            cursorController.hideAndFreezeCursor()
             try inputBlocker.start()
             scheduleAutoUnlockIfNeeded()
             state = .active
@@ -88,6 +98,8 @@ final class CleaningModeManager: ObservableObject {
             autoUnlockTimer?.invalidate()
             autoUnlockTimer = nil
             inputBlocker.stop()
+            pointerDeviceSeizer.stop()
+            cursorController.restoreCursor()
             overlayManager.hideOverlay()
             state = .inactive
             showMessage(
@@ -106,6 +118,8 @@ final class CleaningModeManager: ObservableObject {
         autoUnlockTimer?.invalidate()
         autoUnlockTimer = nil
         inputBlocker.stop()
+        pointerDeviceSeizer.stop()
+        cursorController.restoreCursor()
         overlayManager.hideOverlay()
         state = .inactive
     }
@@ -125,7 +139,12 @@ final class CleaningModeManager: ObservableObject {
     }
 
     private func handleCommandStateChanged(_ commandState: CommandKeyState) {
-        guard state.isActive else { return }
+        switch state {
+        case .active, .unlocking:
+            break
+        case .inactive, .starting, .stopping:
+            return
+        }
 
         overlayManager.updateCommandKeyState(commandState)
 
@@ -143,6 +162,8 @@ final class CleaningModeManager: ObservableObject {
         autoUnlockTimer?.invalidate()
         autoUnlockTimer = nil
         inputBlocker.stop()
+        pointerDeviceSeizer.stop()
+        cursorController.restoreCursor()
         overlayManager.markUnlockCompleted()
 
         unlockCompletionTask?.cancel()
@@ -177,11 +198,14 @@ final class CleaningModeManager: ObservableObject {
 
         let interval = preferences.autoUnlockDuration.timeInterval
 
-        autoUnlockTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
+        let timer = Timer(timeInterval: interval, repeats: false) { [weak self] _ in
             Task { @MainActor in
                 self?.stopCleaningMode()
             }
         }
+
+        RunLoop.main.add(timer, forMode: .common)
+        autoUnlockTimer = timer
     }
 
     private func showMessage(title: String, message: String) {
