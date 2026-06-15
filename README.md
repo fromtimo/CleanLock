@@ -63,10 +63,12 @@ sudo xattr -r -c /Applications/CleanLock.app
 ## Demo
 
 <p align="center">
-  <img src="assets/demo-1.0.1.apng" width="720" alt="Демо CleanLock">
+  <video src="cleanlock-demo.mp4" width="720" controls muted playsinline>
+    Демо CleanLock
+  </video>
 </p>
 
-[Посмотреть MP4-демо](assets/demo.mp4)
+[Посмотреть MP4-демо](cleanlock-demo.mp4)
 
 ## Зачем это нужно
 
@@ -265,10 +267,12 @@ The public build is not signed or notarized by Apple yet, so macOS may show a se
 ## Demo
 
 <p align="center">
-  <img src="assets/demo-1.0.1.apng" width="720" alt="CleanLock demo">
+  <video src="cleanlock-demo.mp4" width="720" controls muted playsinline>
+    CleanLock demo
+  </video>
 </p>
 
-[Watch the MP4 demo](assets/demo.mp4)
+[Watch the MP4 demo](cleanlock-demo.mp4)
 
 ## Why
 
