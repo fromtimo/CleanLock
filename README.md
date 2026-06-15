@@ -63,9 +63,7 @@ sudo xattr -r -c /Applications/CleanLock.app
 ## Demo
 
 <p align="center">
-  <video src="cleanlock-demo.mp4" width="720" controls muted playsinline>
-    Демо CleanLock
-  </video>
+  <img src="assets/demo-1.0.2.apng" width="720" alt="Демо CleanLock">
 </p>
 
 [Посмотреть MP4-демо](cleanlock-demo.mp4)
@@ -267,9 +265,7 @@ The public build is not signed or notarized by Apple yet, so macOS may show a se
 ## Demo
 
 <p align="center">
-  <video src="cleanlock-demo.mp4" width="720" controls muted playsinline>
-    CleanLock demo
-  </video>
+  <img src="assets/demo-1.0.2.apng" width="720" alt="CleanLock demo">
 </p>
 
 [Watch the MP4 demo](cleanlock-demo.mp4)
