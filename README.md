@@ -235,7 +235,7 @@ CleanLock does not clean anything by itself. It simply prevents macOS from react
 5. If macOS says the app is damaged or cannot be opened, run this command in Terminal:
 
 ```bash
-xattr -dr com.apple.quarantine /Applications/CleanLock.app
+sudo xattr -r -c /Applications/CleanLock.app
 ```
 
 Then launch CleanLock from `Applications` and complete onboarding.
