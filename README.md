@@ -200,6 +200,10 @@ CleanLock - сфокусированная macOS-утилита. Она наме
 
 Issues и pull requests приветствуются.
 
+## Обратная связь
+
+Если ты попробовал CleanLock и хочешь поделиться впечатлениями, идеями или проблемами, заполни короткую [форму обратной связи](https://docs.google.com/forms/d/e/1FAIpQLSeMelNz2fUSTlgSQnH69YAe6DC7Prpq5g8zZ4nWNhFSP6MmXg/viewform?usp=dialog).
+
 ## Лицензия
 
 CleanLock распространяется под лицензией MIT. См. [LICENSE](LICENSE).
@@ -397,6 +401,10 @@ The first launch will show onboarding and guide you through the required macOS p
 CleanLock is a focused macOS utility. It is usable, intentionally small, and built around one job: making it less annoying to clean a MacBook without triggering random input.
 
 Issues and pull requests are welcome.
+
+## Feedback
+
+If you tried CleanLock and want to share thoughts, ideas, or issues, please fill out this short [feedback form](https://docs.google.com/forms/d/e/1FAIpQLSeMelNz2fUSTlgSQnH69YAe6DC7Prpq5g8zZ4nWNhFSP6MmXg/viewform?usp=dialog).
 
 ## License
 
