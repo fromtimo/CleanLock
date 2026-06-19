@@ -15,6 +15,7 @@ SWIFT_FILES=(
   "$ROOT_DIR/CleanLock/Controllers/MenuBarController.swift"
   "$ROOT_DIR/CleanLock/Controllers/SettingsWindowController.swift"
   "$ROOT_DIR/CleanLock/Managers/CleaningModeManager.swift"
+  "$ROOT_DIR/CleanLock/Managers/CleaningSessionStore.swift"
   "$ROOT_DIR/CleanLock/Managers/CursorController.swift"
   "$ROOT_DIR/CleanLock/Managers/InputBlocker.swift"
   "$ROOT_DIR/CleanLock/Managers/OverlayManager.swift"
