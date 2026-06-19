@@ -25,7 +25,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
-        CleaningModeManager.shared.stopCleaningMode()
+        CleaningModeManager.shared.handleAppWillTerminate()
     }
 
     private func installSystemObservers() {

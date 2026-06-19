@@ -162,6 +162,15 @@ final class CleaningModeManager: ObservableObject {
         attemptResume()
     }
 
+    /// Called on graceful app termination. Tears down if active and clears any
+    /// persisted deadline so a deliberate quit does not resurrect cleaning on
+    /// next launch. (A crash never calls this, so crash-recovery via
+    /// reconcilePersistedSession() is preserved.)
+    func handleAppWillTerminate() {
+        stopCleaningMode()
+        sessionStore.clear()
+    }
+
     /// Tears down the active layers but KEEPS the persisted deadline, so the
     /// session can resume on unlock/wake. Used for lock and sleep (interruptions
     /// that an app cannot prevent), as opposed to stopCleaningMode() which ends it.
@@ -191,7 +200,6 @@ final class CleaningModeManager: ObservableObject {
         let permissionManager = PermissionManager.shared
         permissionManager.checkPermissions()
         guard permissionManager.canAttemptCleaningMode else {
-            sessionStore.clear()
             return
         }
 
