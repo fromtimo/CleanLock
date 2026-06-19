@@ -3,6 +3,7 @@ import AppKit
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var menuBarController: MenuBarController?
+    private let sessionLockObserver = SessionLockObserver()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let hasCompletedOnboarding = PreferencesStore.shared.hasCompletedOnboarding
@@ -12,6 +13,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menuBarController.install()
         self.menuBarController = menuBarController
         installSystemObservers()
+        CleaningModeManager.shared.reconcilePersistedSession()
 
         if !hasCompletedOnboarding {
             menuBarController.showOnboarding()
@@ -34,16 +36,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             object: nil
         )
 
+        NSWorkspace.shared.notificationCenter.addObserver(
+            self,
+            selector: #selector(handleDidWake),
+            name: NSWorkspace.didWakeNotification,
+            object: nil
+        )
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleScreenParametersChanged),
             name: NSApplication.didChangeScreenParametersNotification,
             object: nil
         )
+
+        sessionLockObserver.onLocked = {
+            CleaningModeManager.shared.handleSessionLocked()
+        }
+        sessionLockObserver.onUnlocked = {
+            CleaningModeManager.shared.handleSessionUnlocked()
+        }
+        sessionLockObserver.start()
     }
 
     @objc private func handleWillSleep() {
         CleaningModeManager.shared.handleSystemWillSleep()
+    }
+
+    @objc private func handleDidWake() {
+        CleaningModeManager.shared.handleSystemDidWake()
     }
 
     @objc private func handleScreenParametersChanged() {
