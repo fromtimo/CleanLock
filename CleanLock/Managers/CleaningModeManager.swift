@@ -142,7 +142,68 @@ final class CleaningModeManager: ObservableObject {
     }
 
     func handleSystemWillSleep() {
-        stopCleaningMode()
+        pauseCleaning()
+    }
+
+    func handleSessionLocked() {
+        pauseCleaning()
+    }
+
+    func handleSessionUnlocked() {
+        attemptResume()
+    }
+
+    func handleSystemDidWake() {
+        attemptResume()
+    }
+
+    /// Re-applies a persisted cleaning session at launch (survives a crash).
+    func reconcilePersistedSession() {
+        attemptResume()
+    }
+
+    /// Tears down the active layers but KEEPS the persisted deadline, so the
+    /// session can resume on unlock/wake. Used for lock and sleep (interruptions
+    /// that an app cannot prevent), as opposed to stopCleaningMode() which ends it.
+    private func pauseCleaning() {
+        guard state.isActive else { return }
+
+        unlockCompletionTask?.cancel()
+        unlockCompletionTask = nil
+        teardownActiveLayers()
+        state = .inactive
+    }
+
+    /// Resumes a paused session if there is remaining time and the screen is not
+    /// locked. Silent (no prompt). Continues the remaining time, never restarts.
+    private func attemptResume() {
+        guard !state.isActive else { return }
+        guard let endsAt = sessionStore.cleaningEndsAt else { return }
+
+        let remaining = endsAt.timeIntervalSinceNow
+        guard remaining > 0 else {
+            sessionStore.clear()
+            return
+        }
+
+        guard !SessionLockObserver.isScreenLocked else { return }
+
+        let permissionManager = PermissionManager.shared
+        permissionManager.checkPermissions()
+        guard permissionManager.canAttemptCleaningMode else {
+            sessionStore.clear()
+            return
+        }
+
+        state = .starting
+        do {
+            try activateLayers(autoUnlockInterval: remaining)
+            state = .active
+        } catch {
+            teardownActiveLayers()
+            sessionStore.clear()
+            state = .inactive
+        }
     }
 
     func handleDisplayConfigurationChanged() {
