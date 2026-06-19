@@ -23,6 +23,7 @@ final class CleaningModeManager: ObservableObject {
     private let preferences: PreferencesStore
     private let pointerDeviceSeizer: PointerDeviceSeizer
     private let cursorController: CursorController
+    private let idleSleepAssertion: IdleSleepAssertion
     private var autoUnlockTimer: Timer?
     private var unlockCompletionTask: Task<Void, Never>?
 
@@ -32,7 +33,8 @@ final class CleaningModeManager: ObservableObject {
             overlayManager: OverlayManager(),
             preferences: PreferencesStore.shared,
             pointerDeviceSeizer: PointerDeviceSeizer(),
-            cursorController: CursorController()
+            cursorController: CursorController(),
+            idleSleepAssertion: IdleSleepAssertion()
         )
     }
 
@@ -41,13 +43,15 @@ final class CleaningModeManager: ObservableObject {
         overlayManager: OverlayManager,
         preferences: PreferencesStore,
         pointerDeviceSeizer: PointerDeviceSeizer,
-        cursorController: CursorController
+        cursorController: CursorController,
+        idleSleepAssertion: IdleSleepAssertion
     ) {
         self.inputBlocker = inputBlocker
         self.overlayManager = overlayManager
         self.preferences = preferences
         self.pointerDeviceSeizer = pointerDeviceSeizer
         self.cursorController = cursorController
+        self.idleSleepAssertion = idleSleepAssertion
 
         self.inputBlocker.onCommandStateChanged = { [weak self] commandState in
             Task { @MainActor in
@@ -107,6 +111,7 @@ final class CleaningModeManager: ObservableObject {
         pointerDeviceSeizer.start()
         cursorController.hideAndFreezeCursor()
         try inputBlocker.start()
+        idleSleepAssertion.begin()
         scheduleAutoUnlock(after: autoUnlockInterval)
     }
 
@@ -117,6 +122,7 @@ final class CleaningModeManager: ObservableObject {
         pointerDeviceSeizer.stop()
         cursorController.restoreCursor()
         overlayManager.hideOverlay()
+        idleSleepAssertion.end()
     }
 
     func stopCleaningMode() {
@@ -169,6 +175,7 @@ final class CleaningModeManager: ObservableObject {
         inputBlocker.stop()
         pointerDeviceSeizer.stop()
         cursorController.restoreCursor()
+        idleSleepAssertion.end()
         overlayManager.markUnlockCompleted()
 
         unlockCompletionTask?.cancel()
