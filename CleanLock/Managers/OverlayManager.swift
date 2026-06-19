@@ -45,7 +45,11 @@ final class OverlayManager {
     private var entranceTask: Task<Void, Never>?
     private var countdownTask: Task<Void, Never>?
 
-    func showOverlay(displayScope: DisplayScope, autoUnlockDuration: AutoUnlockDuration) throws {
+    func showOverlay(
+        displayScope: DisplayScope,
+        autoUnlockDuration: AutoUnlockDuration,
+        remainingOverride: TimeInterval? = nil
+    ) throws {
         hideOverlay(immediately: true)
 
         let screens = selectedScreens(for: displayScope)
@@ -58,7 +62,8 @@ final class OverlayManager {
         let backgroundDuration = reduceMotion ? 0.15 : 0.8
         let contentDelay: TimeInterval = reduceMotion ? 0 : 0.40
         let contentDuration: TimeInterval = reduceMotion ? 0.15 : 0.6
-        let autoUnlockSeconds = Int(autoUnlockDuration.timeInterval)
+        let countdownDuration = remainingOverride ?? autoUnlockDuration.timeInterval
+        let autoUnlockSeconds = Int(countdownDuration.rounded(.up))
 
         records = screens.map { screen in
             let state = OverlayState()
@@ -131,7 +136,7 @@ final class OverlayManager {
             }
         }
 
-        startAutoUnlockCountdown(duration: autoUnlockDuration.timeInterval)
+        startAutoUnlockCountdown(duration: countdownDuration)
     }
 
     func updateCommandKeyState(_ state: CommandKeyState) {
