@@ -20,6 +20,7 @@ SWIFT_FILES=(
   "$ROOT_DIR/CleanLock/Managers/InputBlocker.swift"
   "$ROOT_DIR/CleanLock/Managers/OverlayManager.swift"
   "$ROOT_DIR/CleanLock/Managers/PermissionManager.swift"
+  "$ROOT_DIR/CleanLock/Managers/IdleSleepAssertion.swift"
   "$ROOT_DIR/CleanLock/Managers/PointerDeviceSeizer.swift"
   "$ROOT_DIR/CleanLock/Managers/PreferencesStore.swift"
   "$ROOT_DIR/CleanLock/Models/AutoUnlockDuration.swift"
