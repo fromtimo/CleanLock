@@ -84,23 +84,12 @@ final class CleaningModeManager: ObservableObject {
             return
         }
 
+        let interval = preferences.autoUnlockDuration.timeInterval
         do {
-            try overlayManager.showOverlay(
-                displayScope: preferences.displayScope,
-                autoUnlockDuration: preferences.autoUnlockDuration
-            )
-            pointerDeviceSeizer.start()
-            cursorController.hideAndFreezeCursor()
-            try inputBlocker.start()
-            scheduleAutoUnlockIfNeeded()
+            try activateLayers(autoUnlockInterval: interval)
             state = .active
         } catch {
-            autoUnlockTimer?.invalidate()
-            autoUnlockTimer = nil
-            inputBlocker.stop()
-            pointerDeviceSeizer.stop()
-            cursorController.restoreCursor()
-            overlayManager.hideOverlay()
+            teardownActiveLayers()
             state = .inactive
             showMessage(
                 title: text(.cleaningModeNotStarted),
@@ -109,18 +98,34 @@ final class CleaningModeManager: ObservableObject {
         }
     }
 
-    func stopCleaningMode() {
-        guard state.isActive else { return }
+    private func activateLayers(autoUnlockInterval: TimeInterval) throws {
+        try overlayManager.showOverlay(
+            displayScope: preferences.displayScope,
+            autoUnlockDuration: preferences.autoUnlockDuration,
+            remainingOverride: autoUnlockInterval
+        )
+        pointerDeviceSeizer.start()
+        cursorController.hideAndFreezeCursor()
+        try inputBlocker.start()
+        scheduleAutoUnlock(after: autoUnlockInterval)
+    }
 
-        unlockCompletionTask?.cancel()
-        unlockCompletionTask = nil
-        state = .stopping
+    private func teardownActiveLayers() {
         autoUnlockTimer?.invalidate()
         autoUnlockTimer = nil
         inputBlocker.stop()
         pointerDeviceSeizer.stop()
         cursorController.restoreCursor()
         overlayManager.hideOverlay()
+    }
+
+    func stopCleaningMode() {
+        guard state.isActive else { return }
+
+        unlockCompletionTask?.cancel()
+        unlockCompletionTask = nil
+        state = .stopping
+        teardownActiveLayers()
         state = .inactive
     }
 
@@ -192,11 +197,9 @@ final class CleaningModeManager: ObservableObject {
         }
     }
 
-    private func scheduleAutoUnlockIfNeeded() {
+    private func scheduleAutoUnlock(after interval: TimeInterval) {
         autoUnlockTimer?.invalidate()
         autoUnlockTimer = nil
-
-        let interval = preferences.autoUnlockDuration.timeInterval
 
         let timer = Timer(timeInterval: interval, repeats: false) { [weak self] _ in
             Task { @MainActor in
