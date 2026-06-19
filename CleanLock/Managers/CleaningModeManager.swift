@@ -24,6 +24,7 @@ final class CleaningModeManager: ObservableObject {
     private let pointerDeviceSeizer: PointerDeviceSeizer
     private let cursorController: CursorController
     private let idleSleepAssertion: IdleSleepAssertion
+    private let sessionStore: CleaningSessionStore
     private var autoUnlockTimer: Timer?
     private var unlockCompletionTask: Task<Void, Never>?
 
@@ -34,7 +35,8 @@ final class CleaningModeManager: ObservableObject {
             preferences: PreferencesStore.shared,
             pointerDeviceSeizer: PointerDeviceSeizer(),
             cursorController: CursorController(),
-            idleSleepAssertion: IdleSleepAssertion()
+            idleSleepAssertion: IdleSleepAssertion(),
+            sessionStore: CleaningSessionStore()
         )
     }
 
@@ -44,7 +46,8 @@ final class CleaningModeManager: ObservableObject {
         preferences: PreferencesStore,
         pointerDeviceSeizer: PointerDeviceSeizer,
         cursorController: CursorController,
-        idleSleepAssertion: IdleSleepAssertion
+        idleSleepAssertion: IdleSleepAssertion,
+        sessionStore: CleaningSessionStore
     ) {
         self.inputBlocker = inputBlocker
         self.overlayManager = overlayManager
@@ -52,6 +55,7 @@ final class CleaningModeManager: ObservableObject {
         self.pointerDeviceSeizer = pointerDeviceSeizer
         self.cursorController = cursorController
         self.idleSleepAssertion = idleSleepAssertion
+        self.sessionStore = sessionStore
 
         self.inputBlocker.onCommandStateChanged = { [weak self] commandState in
             Task { @MainActor in
@@ -91,6 +95,7 @@ final class CleaningModeManager: ObservableObject {
         let interval = preferences.autoUnlockDuration.timeInterval
         do {
             try activateLayers(autoUnlockInterval: interval)
+            sessionStore.cleaningEndsAt = Date().addingTimeInterval(interval)
             state = .active
         } catch {
             teardownActiveLayers()
@@ -132,6 +137,7 @@ final class CleaningModeManager: ObservableObject {
         unlockCompletionTask = nil
         state = .stopping
         teardownActiveLayers()
+        sessionStore.clear()
         state = .inactive
     }
 
@@ -176,6 +182,7 @@ final class CleaningModeManager: ObservableObject {
         pointerDeviceSeizer.stop()
         cursorController.restoreCursor()
         idleSleepAssertion.end()
+        sessionStore.clear()
         overlayManager.markUnlockCompleted()
 
         unlockCompletionTask?.cancel()
