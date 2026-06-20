@@ -18,6 +18,9 @@
 		000000000000000000000058 /* CleaningModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000038 /* CleaningModeManager.swift */; };
 		000000000000000000000066 /* PointerDeviceSeizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000067 /* PointerDeviceSeizer.swift */; };
 		000000000000000000000068 /* CursorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000069 /* CursorController.swift */; };
+		000000000000000000000090 /* CleaningSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000080 /* CleaningSessionStore.swift */; };
+		000000000000000000000091 /* IdleSleepAssertion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000081 /* IdleSleepAssertion.swift */; };
+		000000000000000000000092 /* SessionLockObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000082 /* SessionLockObserver.swift */; };
 		00000000000000000000005A /* CleaningModeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000003A /* CleaningModeState.swift */; };
 		00000000000000000000005B /* OnboardingStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000003B /* OnboardingStep.swift */; };
 		00000000000000000000005C /* AutoUnlockDuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000003C /* AutoUnlockDuration.swift */; };
@@ -44,6 +47,9 @@
 		000000000000000000000038 /* CleaningModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleaningModeManager.swift; sourceTree = "<group>"; };
 		000000000000000000000067 /* PointerDeviceSeizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PointerDeviceSeizer.swift; sourceTree = "<group>"; };
 		000000000000000000000069 /* CursorController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorController.swift; sourceTree = "<group>"; };
+		000000000000000000000080 /* CleaningSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleaningSessionStore.swift; sourceTree = "<group>"; };
+		000000000000000000000081 /* IdleSleepAssertion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdleSleepAssertion.swift; sourceTree = "<group>"; };
+		000000000000000000000082 /* SessionLockObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionLockObserver.swift; sourceTree = "<group>"; };
 		00000000000000000000003A /* CleaningModeState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleaningModeState.swift; sourceTree = "<group>"; };
 		00000000000000000000003B /* OnboardingStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStep.swift; sourceTree = "<group>"; };
 		00000000000000000000003C /* AutoUnlockDuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoUnlockDuration.swift; sourceTree = "<group>"; };
@@ -126,6 +132,9 @@
 				000000000000000000000036 /* InputBlocker.swift */,
 				000000000000000000000067 /* PointerDeviceSeizer.swift */,
 				000000000000000000000069 /* CursorController.swift */,
+				000000000000000000000080 /* CleaningSessionStore.swift */,
+				000000000000000000000081 /* IdleSleepAssertion.swift */,
+				000000000000000000000082 /* SessionLockObserver.swift */,
 				000000000000000000000037 /* OverlayManager.swift */,
 			);
 			path = Managers;
@@ -256,6 +265,9 @@
 				000000000000000000000056 /* InputBlocker.swift in Sources */,
 				000000000000000000000066 /* PointerDeviceSeizer.swift in Sources */,
 				000000000000000000000068 /* CursorController.swift in Sources */,
+				000000000000000000000090 /* CleaningSessionStore.swift in Sources */,
+				000000000000000000000091 /* IdleSleepAssertion.swift in Sources */,
+				000000000000000000000092 /* SessionLockObserver.swift in Sources */,
 				000000000000000000000057 /* OverlayManager.swift in Sources */,
 				000000000000000000000058 /* CleaningModeManager.swift in Sources */,
 				00000000000000000000005A /* CleaningModeState.swift in Sources */,
